@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Session } from '@/types/auth';
 import { getSession, logout as authLogout } from '@/lib/auth';
@@ -14,29 +14,15 @@ export function useAuth() {
     setLoading(false);
   }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     authLogout();
     setSession(null);
     router.push('/login');
-  };
-
-  const requireAuth = () => {
-    if (!loading && !session) {
-      router.push('/login');
-    }
-  };
-
-  const requireNoAuth = () => {
-    if (!loading && session) {
-      router.push('/dashboard');
-    }
-  };
+  }, [router]);
 
   return {
     session,
     loading,
     logout,
-    requireAuth,
-    requireNoAuth,
   };
 }

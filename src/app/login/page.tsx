@@ -1,17 +1,29 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import LoginForm from '@/components/auth/LoginForm';
+import SplashScreen from '@/components/shared/SplashScreen';
 
 export default function LoginPage() {
-  const { loading, requireNoAuth } = useAuth();
+  const { session, loading } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    requireNoAuth();
-  }, [requireNoAuth]);
+    setMounted(true);
+  }, []);
 
-  if (loading) return null;
+  useEffect(() => {
+    if (mounted && !loading && session) {
+      router.push('/dashboard');
+    }
+  }, [mounted, loading, session, router]);
+
+  if (loading) return <SplashScreen />;
+
+  if (session) return null;
 
   return <LoginForm />;
 }

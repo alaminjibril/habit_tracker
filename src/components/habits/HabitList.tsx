@@ -35,7 +35,7 @@ export default function HabitList({ habits, onToggle, onUpdate, onDelete }: Habi
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
+    <div data-testid="habit-list" className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
       {habits.map((habit) => (
         <HabitCard
           key={habit.id}

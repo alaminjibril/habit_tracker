@@ -123,11 +123,25 @@ test.describe('Habit Tracker app', () => {
 
   test('loads the cached app shell when offline after the app has been loaded once', async ({ page, context }) => {
     await page.goto('/');
+    
+    // Wait for Service Worker to be fully registered, active, and controlling the page
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+      if (!navigator.serviceWorker.controller) {
+        await new Promise((resolve) => {
+          navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true });
+        });
+      }
+    });
+
     // Simulate offline
     await context.setOffline(true);
-    await page.reload();
-    // In a real PWA, this would show the cached page. 
-    // Testing SW in E2E can be tricky, but we verify basic navigation doesn't crash if cached.
-    await expect(page.getByTestId('splash-screen')).toBeVisible();
+    // Navigation should still work via SW
+    await page.goto('/');
+    
+    // Verify either splash screen is visible or we've already redirected
+    // This proves the cached app shell loaded and executed correctly
+    const appShellElements = page.locator('[data-testid="splash-screen"], [data-testid="dashboard-page"], [data-testid="auth-login-email"]');
+    await expect(appShellElements.first()).toBeVisible();
   });
 });

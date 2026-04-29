@@ -14,12 +14,15 @@ interface HabitFormProps {
 export default function HabitForm({ onSave, onCancel, initialData }: HabitFormProps) {
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
-      onSave(name, description);
+    if (!name.trim()) {
+      setError('Habit name is required');
+      return;
     }
+    onSave(name, description);
   };
 
   return (
@@ -47,11 +50,14 @@ export default function HabitForm({ onSave, onCancel, initialData }: HabitFormPr
             type="text"
             data-testid="habit-name-input"
             value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
+            onChange={(e) => {
+              setName(e.target.value);
+              if (error) setError('');
+            }}
             placeholder="e.g. Drink water"
             className="w-full px-6 py-4 bg-[#F5FAFA] dark:bg-zinc-800/50 border border-transparent focus:border-[#2DBFAD] focus:bg-white dark:focus:bg-zinc-800 rounded-2xl outline-none transition-all font-medium dark:text-white"
           />
+          {error && <p className="text-red-500 text-xs mt-2 ml-1">{error}</p>}
         </div>
 
         <div>

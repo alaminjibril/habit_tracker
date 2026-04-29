@@ -5,16 +5,25 @@ import { useAuth } from '@/hooks/useAuth';
 import { useHabits } from '@/hooks/useHabits';
 import HabitList from '@/components/habits/HabitList';
 import HabitForm from '@/components/habits/HabitForm';
-import ThemeToggle from '@/components/shared/ThemeToggle';
+import { useRouter } from 'next/navigation';
+import SplashScreen from '@/components/shared/SplashScreen';
 
 export default function DashboardPage() {
-  const { session, loading: authLoading, logout, requireAuth } = useAuth();
+  const { session, loading: authLoading, logout } = useAuth();
   const { habits, addHabit, updateHabit, deleteHabit, toggleCompletion } = useHabits();
   const [isAdding, setIsAdding] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    requireAuth();
-  }, [requireAuth]);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !authLoading && !session) {
+      router.push('/login');
+    }
+  }, [mounted, authLoading, session, router]);
 
   const weekDays = useMemo(() => {
     const now = new Date();
@@ -35,7 +44,11 @@ export default function DashboardPage() {
     });
   }, []);
 
-  if (authLoading || !session) {
+  if (authLoading) {
+    return <SplashScreen />;
+  }
+
+  if (!session) {
     return null;
   }
 
@@ -55,7 +68,7 @@ export default function DashboardPage() {
                 <path d="M18 30L28 40L45 20" stroke="white" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">HabiTrack</h1>
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Habit Tracker</h1>
           </div>
 
           <div className="mb-10">
@@ -97,9 +110,6 @@ export default function DashboardPage() {
                 Hello,<span className="text-[#2DBFAD] capitalize ml-1">{username}</span>
               </h2>
               <p className="text-[#8A9BB0] text-sm font-medium mt-1">Let's keep up the good work! 👏</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
             </div>
           </div>
 
@@ -157,18 +167,12 @@ export default function DashboardPage() {
           )}
 
           {/* Visual Frequency Toggles */}
-          <div className="flex p-1.5 bg-white dark:bg-[#1A1A1A] rounded-2xl mb-8 border border-zinc-100 dark:border-zinc-800 shadow-sm max-w-sm">
+          <div className="flex p-1.5 bg-white dark:bg-[#1A1A1A] rounded-2xl mb-8 border border-zinc-100 dark:border-zinc-800 shadow-sm max-w-[160px]">
             <div className="flex-1 py-2.5 px-4 bg-[#2DBFAD] text-white rounded-xl text-center text-sm font-bold flex items-center justify-center gap-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               Once a day
-            </div>
-            <div className="flex-1 py-2.5 px-4 text-[#8A9BB0] text-center text-sm font-bold flex items-center justify-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Multiple times
             </div>
           </div>
 
@@ -186,21 +190,10 @@ export default function DashboardPage() {
           />
         </main>
 
-        {/* Floating Add Button (Mobile) */}
         <button
           onClick={() => setIsAdding(true)}
           data-testid="create-habit-button"
-          className="fixed bottom-10 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#2DBFAD] text-white rounded-full flex items-center justify-center shadow-2xl shadow-[#2DBFAD]/40 hover:scale-110 active:scale-95 transition-all z-40 lg:hidden"
-        >
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-        </button>
-
-        {/* Desktop Add Button (Fixed or Inline) */}
-        <button
-          onClick={() => setIsAdding(true)}
-          className="hidden lg:flex fixed bottom-12 right-12 w-16 h-16 bg-[#2DBFAD] text-white rounded-full items-center justify-center shadow-2xl shadow-[#2DBFAD]/40 hover:scale-110 active:scale-95 transition-all z-40"
+          className="fixed bottom-10 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#2DBFAD] text-white rounded-full flex items-center justify-center shadow-2xl shadow-[#2DBFAD]/40 hover:scale-110 active:scale-95 transition-all z-40 lg:bottom-12 lg:right-12 lg:left-auto lg:translate-x-0"
         >
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
