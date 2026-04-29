@@ -30,7 +30,7 @@ export default function SplashScreen() {
           </svg>
         </div>
         <h1 className="text-4xl font-black tracking-tight mb-4">
-          HabiTrack
+          Habit Tracker
         </h1>
         
         <div className="flex gap-1.5 mt-4">

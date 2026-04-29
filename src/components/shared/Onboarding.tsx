@@ -9,7 +9,7 @@ interface OnboardingProps {
 
 const steps = [
   {
-    title: "Welcome To HabiTrack!",
+    title: "Welcome To Habit Tracker!",
     subtitle: "Build your routine and choose from suggested habits or create your own to suit your life.",
     image: "/images/onboarding-1.png",
   },

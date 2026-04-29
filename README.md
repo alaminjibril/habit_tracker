@@ -2,145 +2,74 @@
 
 A Progressive Web App for tracking daily habits with offline support and installable features.
 
-**Features:** Sign up, login, create/edit/delete habits, mark complete, track streaks, offline-capable, installable
-
----
-
 ## 🚀 Quick Start
 
 ```bash
-# Install
+# Install dependencies
 npm install
 
-# Dev
+# Run development server
 npm run dev
-# Visit http://localhost:3000
 
-# Test
-npm run test:unit
-npm run test:integration
-npm run test:e2e
-
-# Build & Deploy
-npm run build
-npm run start
+# Run all tests
+npm run test
 ```
 
----
+## 📁 Project Overview
+This application is a mobile-first Habit Tracker designed to help users build consistency. It supports user authentication, habit management (CRUD), and streak tracking. All data is persisted locally to ensure a fast, private, and deterministic experience.
 
-## 📁 Structure
+## 📁 Data Storage & Local Persistence
+The app uses `localStorage` for persistence. The data is structured as follows:
 
-```
-src/
-├── app/              # Pages & routes
-├── components/       # React components
-├── lib/              # Utilities & functions
-├── types/            # TypeScript types
-public/
-├── manifest.json     # PWA config
-├── sw.js             # Service worker
-└── icons/            # App icons
-tests/               # Unit, integration, e2e tests
-```
+- **`habit-tracker-users`**: A JSON array of user objects.
+  ```typescript
+  { id: string; email: string; password: string; createdAt: string; }
+  ```
+- **`habit-tracker-session`**: The current session data.
+  ```typescript
+  { userId: string; email: string; } | null
+  ```
+- **`habit-tracker-habits`**: A JSON array of habits.
+  ```typescript
+  { id: string; userId: string; name: string; description: string; frequency: 'daily'; createdAt: string; completions: string[]; }
+  ```
 
----
+## 📱 PWA Implementation
+PWA support is implemented using a standard manifest and a custom service worker:
+- **`manifest.json`**: Defines the app's metadata, including icons (192x192 and 512x512), theme colors, and display mode (`standalone`).
+- **`sw.js`**: A service worker that handles:
+  - **Pre-caching**: Caches the "app shell" (main routes and assets) during the `install` event.
+  - **Offline Fallback**: Intercepts fetch requests and serves cached content when the network is unavailable.
+  - **Activation**: Cleans up old caches during the `activate` event.
 
-## 💾 Data Storage
+## 🛠️ Trade-offs & Limitations
+- **Local-only Storage**: Data is stored in the browser's `localStorage`. This means data does not sync across devices or browsers. If the user clears their browser data, their habits and progress will be lost.
+- **Deterministic Auth**: Authentication is handled locally by matching emails and passwords in `localStorage`. This is secure for a local-first demonstration but would require a backend for production.
+- **Single Frequency**: Only "daily" habits are supported in this stage, as per the technical requirements.
 
-All data in **localStorage** (no backend):
+## 🧪 Test Suite Mapping
+The test suite verifies the application's behavior across three levels:
 
-```javascript
-// habit-tracker-users → User accounts
-// habit-tracker-session → Current logged-in user
-// habit-tracker-habits → All habits with completions
-```
+### Unit Tests (`tests/unit/`)
+- **`slug.test.ts`**: Verifies `getHabitSlug` correctly transforms names into URL-friendly strings.
+- **`validators.test.ts`**: Verifies `validateHabitName` correctly enforces name requirements (required, max 60 chars).
+- **`streaks.test.ts`**: Verifies `calculateCurrentStreak` accurately calculates consecutive days, handles duplicates, and resets correctly.
+- **`habits.test.ts`**: Verifies habit completion toggling and storage helper logic.
+- **`auth.test.ts`**: Verifies signup, login, and session management logic.
+- **`storage.test.ts`**: Verifies low-level `localStorage` wrapper functionality.
 
----
+### Integration Tests (`tests/integration/`)
+- **`auth-flow.test.tsx`**: Verifies the UI interaction for signup and login, including error handling for duplicates and invalid credentials.
+- **`habit-form.test.tsx`**: Verifies habit creation, editing, deletion (with confirmation), and completion toggling in the UI.
 
-## 🧪 Test Commands
-
-```bash
-npm run test:unit          # Unit tests
-npm run test:integration   # Component tests
-npm run test:e2e          # Browser tests
-npm run test              # All tests
-```
-
-Required test titles are in each test file.
-
----
-
-## 📱 PWA Installation
-
-**Desktop:** Click install icon → App launches fullscreen  
-**Mobile:** Share menu → Add to Home Screen → Launches fullscreen
-
-Works offline after first load (cached by service worker).
-
----
-
-## 🔑 Key Functions
-
-- `getHabitSlug(name)` — Converts "Drink Water" → "drink-water"
-- `validateHabitName(name)` — Validates habit names (max 60 chars)
-- `calculateCurrentStreak(completions)` — Counts consecutive days
-- `toggleHabitCompletion(habit, date)` — Marks habit done/undone
-
----
-
-## 🔐 Auth
-
-**Signup:** Email + password → creates user + session → /dashboard  
-**Login:** Email + password → creates session → /dashboard  
-**Logout:** Clears session → /login
-
----
-
-## 📖 Routes
-
-| Route | Purpose |
-|-------|---------|
-| `/` | Splash screen (redirects to /login or /dashboard) |
-| `/signup` | Create account |
-| `/login` | Sign in |
-| `/dashboard` | Main app (protected, shows your habits) |
-
----
-
-## 🎯 Habits CRUD
-
-**Create:** Click "Create Habit" → Fill form → Save  
-**Read:** See all your habits on dashboard  
-**Update:** Click Edit → Change name/description → Update  
-**Delete:** Click Delete → Confirm → Gone
-
----
-
-## 📊 Streak Calculation
-
-```
-No completions → 0
-Today completed → 1
-Today + yesterday → 2
-Yesterday (not today) → 0
-```
-
----
-
-## 🚢 Deploy to Vercel
-
-```bash
-git push
-# Auto-deploys when pushed to main
-```
-
-Or manual:
-```bash
-npm run build
-vercel
-```
-
----
+### End-to-End Tests (`tests/e2e/`)
+- **`app.spec.ts`**: Verifies the full user journey:
+  - Splash screen and route protection.
+  - Signup, login, and user-specific habit visibility.
+  - Habit lifecycle from creation to completion.
+  - Persistence after page reloads.
+  - Logout functionality.
+  - Basic offline capability (app shell loading).
 
 ## ⚙️ Scripts
 
@@ -156,69 +85,5 @@ vercel
 }
 ```
 
----
-
-## 📝 Types
-
-```typescript
-// User
-{ id: string; email: string; password: string; createdAt: string }
-
-// Session
-{ userId: string; email: string }
-
-// Habit
-{
-  id: string;
-  userId: string;
-  name: string;
-  description: string;
-  frequency: 'daily';
-  createdAt: string;
-  completions: string[]; // ["2024-04-23", "2024-04-22"]
-}
-```
-
----
-
-## 🐛 Troubleshooting
-
-**App won't start?**
-```bash
-rm -rf node_modules .next
-npm install
-npm run dev
-```
-
-**localStorage missing?** → Check DevTools → Application → Local Storage
-
-**Tests failing?** → Check test file syntax, run with `--reporter=verbose`
-
-**Service worker not working?** → DevTools → Application → Service Workers → Unregister & refresh
-
----
-
-## ✅ Before Submitting
-
-- [ ] All routes working (/, /login, /signup, /dashboard)
-- [ ] Sign up, login, logout working
-- [ ] Create, edit, delete habits working
-- [ ] Mark habit complete updates streak
-- [ ] Data persists after page reload
-- [ ] All tests passing (`npm run test`)
-- [ ] 80%+ coverage on src/lib
-- [ ] App installable (has install button)
-- [ ] Works offline after first load
-- [ ] No TypeScript errors
-- [ ] Deployed to Vercel/Netlify
-
----
-
-## 📱 GitHub & Live URL
-
-**GitHub:** [Your repo URL]  
-**Live:** [Your Vercel/Netlify URL]
-
----
-
-**Done!** 🚀
+## 🚢 Coverage
+The project maintains **80%+ line coverage** for files in `src/lib`.

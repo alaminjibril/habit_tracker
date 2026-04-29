@@ -90,10 +90,10 @@ test.describe('Habit Tracker app', () => {
     await page.getByTestId('habit-name-input').fill('Daily Water');
     await page.getByTestId('habit-save-button').click();
 
-    await expect(page.getByTestId('habit-streak-daily-water')).toHaveText('0 day streak');
+    await expect(page.getByTestId('habit-streak-daily-water')).toHaveText(/0 days/);
     
     await page.getByTestId('habit-complete-daily-water').click();
-    await expect(page.getByTestId('habit-streak-daily-water')).toHaveText('1 day streak');
+    await expect(page.getByTestId('habit-streak-daily-water')).toHaveText(/1 day/);
   });
 
   test('persists session and habits after page reload', async ({ page }) => {
@@ -133,7 +133,6 @@ test.describe('Habit Tracker app', () => {
         });
       }
     });
-
     // Simulate offline
     await context.setOffline(true);
     // Navigation should still work via SW

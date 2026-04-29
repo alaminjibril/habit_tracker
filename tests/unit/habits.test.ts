@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { toggleHabitCompletion } from '@/lib/habits';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { toggleHabitCompletion, getAllHabits, saveAllHabits, getUserHabits } from '@/lib/habits';
 import { Habit } from '@/types/habit';
 
 describe('toggleHabitCompletion', () => {
@@ -35,5 +35,34 @@ describe('toggleHabitCompletion', () => {
     const result = toggleHabitCompletion(habit, '2024-04-23'); // Removes it
     const result2 = toggleHabitCompletion(result, '2024-04-23'); // Adds it back
     expect(result2.completions.filter(d => d === '2024-04-23').length).toBe(1);
+  });
+});
+
+
+
+describe('habit storage helpers', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('gets all habits (empty)', () => {
+    expect(getAllHabits()).toEqual([]);
+  });
+
+  it('saves and gets all habits', () => {
+    const habits: Habit[] = [{ id: '1', userId: 'u1', name: 'H1', description: '', frequency: 'daily', createdAt: '', completions: [] }];
+    saveAllHabits(habits);
+    expect(getAllHabits()).toEqual(habits);
+  });
+
+  it('gets habits for a specific user', () => {
+    const habits: Habit[] = [
+      { id: '1', userId: 'u1', name: 'H1', description: '', frequency: 'daily', createdAt: '', completions: [] },
+      { id: '2', userId: 'u2', name: 'H2', description: '', frequency: 'daily', createdAt: '', completions: [] }
+    ];
+    saveAllHabits(habits);
+    const userHabits = getUserHabits('u1');
+    expect(userHabits.length).toBe(1);
+    expect(userHabits[0].id).toBe('1');
   });
 });
