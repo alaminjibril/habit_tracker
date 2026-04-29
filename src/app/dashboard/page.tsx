@@ -101,8 +101,31 @@ export default function DashboardPage() {
           </div>
         </aside>
 
+        {/* Mobile Header (Visible only on Mobile) */}
+        <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-white dark:bg-[#1A1A1A] border-b border-zinc-100 dark:border-zinc-800 sticky top-0 z-40">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#2DBFAD] rounded-lg flex items-center justify-center shadow-md shadow-[#2DBFAD]/20">
+              <svg width="18" height="18" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="8" height="40" rx="4" fill="white" />
+                <rect x="42" y="10" width="8" height="40" rx="4" fill="white" />
+                <path d="M18 30L28 40L45 20" stroke="white" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <span className="font-bold text-zinc-900 dark:text-white">Habit Tracker</span>
+          </div>
+          <button
+            onClick={logout}
+            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-colors"
+            title="Logout"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+        </header>
+
         {/* Main Content Area */}
-        <main className="flex-1 px-6 pt-12 lg:px-12 pb-32">
+        <main className="flex-1 px-6 py-8 lg:px-12 lg:pt-12 pb-32">
           {/* Header & Greeting */}
           <div className="flex items-center justify-between mb-8">
             <div>
