@@ -20,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   useEffect(() => {
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-      window.addEventListener('load', () => {
+    if ('serviceWorker' in navigator) {
+      const register = () => {
         navigator.serviceWorker.register('/sw.js').then(
           (registration) => {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
@@ -30,7 +30,14 @@ export default function RootLayout({
             console.log('ServiceWorker registration failed: ', err);
           }
         );
-      });
+      };
+
+      if (document.readyState === 'complete') {
+        register();
+      } else {
+        window.addEventListener('load', register);
+        return () => window.removeEventListener('load', register);
+      }
     }
   }, []);
 

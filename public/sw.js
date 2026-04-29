@@ -36,12 +36,28 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
-      return response || fetch(event.request).catch(() => {
-        // Fallback for offline
-        if (event.request.mode === 'navigate') {
-          return caches.match('/');
-        }
-      });
+      if (response) return response;
+
+      return fetch(event.request)
+        .then((networkResponse) => {
+          // Cache Next.js chunks and icons dynamically
+          if (
+            networkResponse.status === 200 &&
+            (event.request.url.includes('_next/static') || event.request.url.includes('/icons/'))
+          ) {
+            const cacheCopy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, cacheCopy);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          if (event.request.mode === 'navigate') {
+            return caches.match('/');
+          }
+          return null;
+        });
     })
   );
 });

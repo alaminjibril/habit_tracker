@@ -55,7 +55,7 @@ export default function DashboardPage() {
                 <path d="M18 30L28 40L45 20" stroke="white" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">HabiTrack</h1>
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Habit Tracker</h1>
           </div>
 
           <div className="mb-10">
@@ -186,21 +186,10 @@ export default function DashboardPage() {
           />
         </main>
 
-        {/* Floating Add Button (Mobile) */}
         <button
           onClick={() => setIsAdding(true)}
           data-testid="create-habit-button"
-          className="fixed bottom-10 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#2DBFAD] text-white rounded-full flex items-center justify-center shadow-2xl shadow-[#2DBFAD]/40 hover:scale-110 active:scale-95 transition-all z-40 lg:hidden"
-        >
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-        </button>
-
-        {/* Desktop Add Button (Fixed or Inline) */}
-        <button
-          onClick={() => setIsAdding(true)}
-          className="hidden lg:flex fixed bottom-12 right-12 w-16 h-16 bg-[#2DBFAD] text-white rounded-full items-center justify-center shadow-2xl shadow-[#2DBFAD]/40 hover:scale-110 active:scale-95 transition-all z-40"
+          className="fixed bottom-10 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#2DBFAD] text-white rounded-full flex items-center justify-center shadow-2xl shadow-[#2DBFAD]/40 hover:scale-110 active:scale-95 transition-all z-40 lg:bottom-12 lg:right-12 lg:left-auto lg:translate-x-0"
         >
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

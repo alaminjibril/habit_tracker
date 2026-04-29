@@ -21,6 +21,7 @@ export default function HabitCard({ habit, onToggle, onEdit, onDelete }: HabitCa
 
   return (
     <div
+      data-testid={`habit-card-${slug}`}
       className={`group relative bg-white dark:bg-[#1A1A1A] p-5 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800 transition-all duration-300 ${isCompletedToday ? 'shadow-none bg-zinc-50/50 dark:bg-zinc-800/20' : 'hover:shadow-md'
         }`}
     >
@@ -39,7 +40,7 @@ export default function HabitCard({ habit, onToggle, onEdit, onDelete }: HabitCa
             {habit.name}
           </h3>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs font-black text-[#2DBFAD] uppercase tracking-wider">
+            <span data-testid={`habit-streak-${slug}`} className="text-xs font-black text-[#2DBFAD] uppercase tracking-wider">
               🔥 {streak} {streak === 1 ? 'day' : 'days'}
             </span>
             {habit.description && (
@@ -55,7 +56,7 @@ export default function HabitCard({ habit, onToggle, onEdit, onDelete }: HabitCa
 
         {/* Completion Checkbox */}
         <button
-          data-testid={`habit-card-${slug}-toggle`}
+          data-testid={`habit-complete-${slug}`}
           onClick={() => onToggle(today)}
           className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all ${isCompletedToday
             ? 'bg-[#2DBFAD] border-[#2DBFAD] text-white'
@@ -71,7 +72,7 @@ export default function HabitCard({ habit, onToggle, onEdit, onDelete }: HabitCa
       {/* Hidden Actions (Visible on Hover/Desktop or via a long press/gesture if implemented) */}
       <div className="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-zinc-50 dark:border-zinc-800 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
-          data-testid={`habit-card-${slug}-edit`}
+          data-testid={`habit-edit-${slug}`}
           onClick={onEdit}
           className="p-1.5 text-zinc-400 hover:text-[#2DBFAD] rounded-lg"
         >
@@ -80,7 +81,7 @@ export default function HabitCard({ habit, onToggle, onEdit, onDelete }: HabitCa
           </svg>
         </button>
         <button
-          data-testid={`habit-card-${slug}-delete`}
+          data-testid={`habit-delete-${slug}`}
           onClick={() => setShowConfirmDelete(true)}
           className="p-1.5 text-zinc-400 hover:text-[#FF6B6B] rounded-lg"
         >
