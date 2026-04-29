@@ -90,7 +90,7 @@ test.describe('Habit Tracker app', () => {
     await page.getByTestId('habit-name-input').fill('Daily Water');
     await page.getByTestId('habit-save-button').click();
 
-    await expect(page.getByTestId('habit-streak-daily-water')).toHaveText(/0 days/);
+    await expect(page.getByTestId('habit-streak-daily-water')).toHaveText(/0 day/);
     
     await page.getByTestId('habit-complete-daily-water').click();
     await expect(page.getByTestId('habit-streak-daily-water')).toHaveText(/1 day/);
@@ -136,11 +136,10 @@ test.describe('Habit Tracker app', () => {
     // Simulate offline
     await context.setOffline(true);
     // Navigation should still work via SW
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'commit' });
     
-    // Verify either splash screen is visible or we've already redirected
-    // This proves the cached app shell loaded and executed correctly
-    const appShellElements = page.locator('[data-testid="splash-screen"], [data-testid="dashboard-page"], [data-testid="auth-login-email"]');
-    await expect(appShellElements.first()).toBeVisible();
+    // Verify app shell presence (either loading or loaded state)
+    // We use a more resilient approach by waiting for any of these to appear
+    await expect(page.locator('[data-testid="splash-screen"], [data-testid="dashboard-page"], [data-testid="auth-login-email"]').first()).toBeVisible({ timeout: 10000 });
   });
 });

@@ -12,66 +12,22 @@
 # Error details
 
 ```
-Test timeout of 30000ms exceeded.
-```
+Error: expect(locator).toBeVisible() failed
 
-```
-Error: page.evaluate: Test timeout of 30000ms exceeded.
-```
+Locator: locator('[data-testid="splash-screen"], [data-testid="dashboard-page"], [data-testid="auth-login-email"]').first()
+Expected: visible
+Timeout: 10000ms
+Error: element(s) not found
 
-# Page snapshot
+Call log:
+  - Expect "toBeVisible" with timeout 10000ms
+  - waiting for locator('[data-testid="splash-screen"], [data-testid="dashboard-page"], [data-testid="auth-login-email"]').first()
 
-```yaml
-- generic [active] [ref=e1]:
-  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
-    - img [ref=e8]
-  - alert [ref=e11]: HabiTrack
-  - generic [ref=e12]:
-    - generic [ref=e14]:
-      - heading "Welcome Back !" [level=1] [ref=e15]
-      - paragraph [ref=e16]: Login to continue building your daily habits .
-    - generic [ref=e18]:
-      - heading "Login" [level=2] [ref=e19]
-      - generic [ref=e20]:
-        - generic [ref=e21]:
-          - generic [ref=e22]: Email
-          - generic [ref=e23]:
-            - img [ref=e25]
-            - textbox "Enter your email" [ref=e27]
-        - generic [ref=e28]:
-          - generic [ref=e29]: Password
-          - generic [ref=e30]:
-            - img [ref=e32]
-            - textbox "Enter your password" [ref=e34]
-            - button [ref=e35]:
-              - img [ref=e36]
-        - link "Forgot Password?" [ref=e39] [cursor=pointer]:
-          - /url: "#"
-        - button "Login" [ref=e40]
-      - paragraph [ref=e42]:
-        - text: Don't have an account?
-        - link "Sign up" [ref=e43] [cursor=pointer]:
-          - /url: /signup
 ```
 
 # Test source
 
 ```ts
-  28  |   test('prevents unauthenticated access to /dashboard', async ({ page }) => {
-  29  |     await page.goto('/dashboard');
-  30  |     await expect(page).toHaveURL(/.*login/);
-  31  |   });
-  32  | 
-  33  |   test('signs up a new user and lands on the dashboard', async ({ page }) => {
-  34  |     await page.goto('/signup');
-  35  |     await page.getByTestId('auth-signup-email').fill('newuser@example.com');
-  36  |     await page.getByTestId('auth-signup-password').fill('password123');
-  37  |     await page.getByTestId('auth-signup-submit').click();
-  38  | 
-  39  |     await expect(page).toHaveURL(/.*dashboard/);
-  40  |     await expect(page.getByTestId('dashboard-page')).toBeVisible();
-  41  |   });
-  42  | 
   43  |   test('logs in an existing user and loads only that user\'s habits', async ({ page }) => {
   44  |     // Signup first user
   45  |     await page.goto('/signup');
@@ -122,10 +78,10 @@ Error: page.evaluate: Test timeout of 30000ms exceeded.
   90  |     await page.getByTestId('habit-name-input').fill('Daily Water');
   91  |     await page.getByTestId('habit-save-button').click();
   92  | 
-  93  |     await expect(page.getByTestId('habit-streak-daily-water')).toHaveText('0 day streak');
+  93  |     await expect(page.getByTestId('habit-streak-daily-water')).toHaveText(/0 day/);
   94  |     
   95  |     await page.getByTestId('habit-complete-daily-water').click();
-  96  |     await expect(page.getByTestId('habit-streak-daily-water')).toHaveText('1 day streak');
+  96  |     await expect(page.getByTestId('habit-streak-daily-water')).toHaveText(/1 day/);
   97  |   });
   98  | 
   99  |   test('persists session and habits after page reload', async ({ page }) => {
@@ -157,8 +113,7 @@ Error: page.evaluate: Test timeout of 30000ms exceeded.
   125 |     await page.goto('/');
   126 |     
   127 |     // Wait for Service Worker to be fully registered, active, and controlling the page
-> 128 |     await page.evaluate(async () => {
-      |                ^ Error: page.evaluate: Test timeout of 30000ms exceeded.
+  128 |     await page.evaluate(async () => {
   129 |       await navigator.serviceWorker.ready;
   130 |       if (!navigator.serviceWorker.controller) {
   131 |         await new Promise((resolve) => {
@@ -166,17 +121,16 @@ Error: page.evaluate: Test timeout of 30000ms exceeded.
   133 |         });
   134 |       }
   135 |     });
-  136 | 
-  137 |     // Simulate offline
-  138 |     await context.setOffline(true);
-  139 |     // Navigation should still work via SW
-  140 |     await page.goto('/');
-  141 |     
-  142 |     // Verify either splash screen is visible or we've already redirected
-  143 |     // This proves the cached app shell loaded and executed correctly
-  144 |     const appShellElements = page.locator('[data-testid="splash-screen"], [data-testid="dashboard-page"], [data-testid="auth-login-email"]');
-  145 |     await expect(appShellElements.first()).toBeVisible();
-  146 |   });
-  147 | });
-  148 | 
+  136 |     // Simulate offline
+  137 |     await context.setOffline(true);
+  138 |     // Navigation should still work via SW
+  139 |     await page.goto('/', { waitUntil: 'commit' });
+  140 |     
+  141 |     // Verify app shell presence (either loading or loaded state)
+  142 |     // We use a more resilient approach by waiting for any of these to appear
+> 143 |     await expect(page.locator('[data-testid="splash-screen"], [data-testid="dashboard-page"], [data-testid="auth-login-email"]').first()).toBeVisible({ timeout: 10000 });
+      |                                                                                                                                           ^ Error: expect(locator).toBeVisible() failed
+  144 |   });
+  145 | });
+  146 | 
 ```
